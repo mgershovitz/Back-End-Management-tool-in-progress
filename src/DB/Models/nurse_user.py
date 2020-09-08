@@ -6,8 +6,26 @@ from werkzeug.utils import redirect
 from src.DB.db import my_db, nurse_details_col
 
 
-class User:
-
+class NurseUser:
+    def __init__():
+        self.id = None
+        self.email = None
+        #etc...
+    
+    @classmethod
+    def get_nurse(name):
+        query = {"name": name}
+        result_doc = nurse_details_col.find_one(my_query)
+        return NurseUser(result_doc.id, result_doc.email)
+    
+    @classmethod
+    def get_all_nurses_names():
+        all_nurses = []
+        nurses_names = nurse_details_col.find({}, {"name"})
+        for nurse in nurses_names:
+            all_nurses.append(nurse)
+        return all_nurses
+        
     def start_session(self, userId):
         session['logged in'] = True
         session['user'] = userId
@@ -38,19 +56,7 @@ class User:
         # Encrypt the password
         user['id_num'] = pbkdf2_sha256.encrypt(user['id_num'])
         return self.start_session(user)
-
-    def get_nurse(name):
-        my_query = {"name": name}
-        my_doc = nurse_details_col.find(my_query)
-        for doc1 in my_doc:
-            return doc1
-
-    def get_all_nurses_names(collection):
-        all_nurses = []
-        nurses_names = collection.find({}, {"name"})
-        for nurse in nurses_names:
-            all_nurses.append(nurse)
-        return all_nurses
+       
 
 
     def get_is_admin(self):
