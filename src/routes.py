@@ -6,6 +6,7 @@ from werkzeug.utils import redirect
 from src.DB.Models.DTO.user import User
 from src.run import app
 from src.forms import LoginForm, RegisterNurseForm, InsertNewBirthData
+from session_utils import loginUser
 
 
 def login_required(f):
@@ -42,7 +43,7 @@ def home():
 
 @app.route("/nurse/screen")
 @login_required
-def nurse():
+def nurse_screen():
     return render_template('nurse_screen.html', posts=posts)
 
 
@@ -66,8 +67,9 @@ def department():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'admin@wolfson.com' and form.password.data == 'password':  # TODO: FIX TO CHECK EMAIL AMD PASSWORDS ARE IN DB
-            User().login()
+        user = NurseUser.get_nurse(form.email.data)
+        if user.validate_password(form.password.data):
+            loginUser(user)
             flash('You have been logged in!', 'success')
             return redirect(url_for('nurse'))
         else:
